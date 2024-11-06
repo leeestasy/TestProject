@@ -1,7 +1,7 @@
-name: Parallel Workflow
+name: Combined Workflow
 on: [push]
 jobs:
-  test-debug:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -10,17 +10,30 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
-      - name: Run test
-        run: dotnet test TestProject.csproj --configuration Debug
+      - name: Build project
+        run: dotnet build TestProject.csproj
+        
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        configuration: [Debug, Release]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Run tests
+        run: dotnet test TestProject.csproj --configuration ${{ matrix.configuration }}
 
-  test-release:
+  analyze:
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '8.0.x'
-      - name: Run test
-        run: dotnet test TestProject.csproj --configuration Release
+      - name: Run code analysis
+        run: dotnet tool install -g dotnet-format && dotnet format TestProject.csproj
