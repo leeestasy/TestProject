@@ -11,7 +11,7 @@ jobs:
         with:
           dotnet-version: '8.0.x'
       - name: Build project
-        run: dotnet build TestProject/TestProject.csproj
+        run: dotnet build TestProject.csproj
   test:
     needs: build
     runs-on: ubuntu-latest
@@ -19,4 +19,4 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Run tests
-        run: dotnet test TestProject/TestProject.csproj
+        run: dotnet test TestProject.csproj
