@@ -1,7 +1,7 @@
-name: Sequential Workflow
+name: Parallel Workflow
 on: [push]
 jobs:
-  build:
+  test-debug:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -10,13 +10,17 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
-      - name: Build project
-        run: dotnet build TestProject.csproj
-  test:
-    needs: build
+      - name: Run test
+        run: dotnet test TestProject.csproj --configuration Debug
+
+  test-release:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Run tests
-        run: dotnet test TestProject.csproj
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Run test
+        run: dotnet test TestProject.csproj --configuration Release
